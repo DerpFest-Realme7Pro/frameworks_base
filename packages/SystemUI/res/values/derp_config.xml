@@ -67,4 +67,8 @@
         aod,anti_flicker,caffeine,compass,cpuinfo,dataswitch,fpsinfo,gaming,heads_up,killapp,locale,livedisplay,mono,powermenu,powershare,reading_mode,reboot,sound,screenshot,soundsearch,sync,usb_tether,volume_panel,vpn,weather
     </string>
 
+    <!-- On-The-Go -->
+    <integer name="quick_settings_onthego_dialog_short_timeout">3000</integer>
+    <integer name="quick_settings_onthego_dialog_long_timeout">6000</integer>
+
 </resources>
