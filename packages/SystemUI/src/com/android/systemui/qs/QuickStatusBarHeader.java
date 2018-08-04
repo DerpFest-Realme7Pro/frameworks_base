@@ -120,9 +120,13 @@ public class QuickStatusBarHeader extends RelativeLayout implements
     private static final int FADE_ANIMATION_DURATION_MS = 300;
     private static final int TOOLTIP_NOT_YET_SHOWN_COUNT = 0;
     public static final int MAX_TOOLTIP_SHOWN_COUNT = 2;
+    private static final int CLOCK_POSITION_LEFT = 2;
+    private static final int CLOCK_POSITION_HIDE = 3;
 
     public static final String STATUS_BAR_CUSTOM_HEADER =
             "system:" + Settings.System.STATUS_BAR_CUSTOM_HEADER;
+    private static final String STATUS_BAR_CLOCK =
+            "system:" + Settings.System.STATUS_BAR_CLOCK;
 
     private final NextAlarmController mAlarmController;
     private final ZenModeController mZenController;
@@ -314,8 +318,8 @@ public class QuickStatusBarHeader extends RelativeLayout implements
         updateResources();
 
         Dependency.get(TunerService.class).addTunable(this,
-                StatusBarIconController.ICON_BLACKLIST,
-                STATUS_BAR_CUSTOM_HEADER);
+                STATUS_BAR_CUSTOM_HEADER,
+                STATUS_BAR_CLOCK);
     }
 
     public QuickQSPanel getHeaderQsPanel() {
@@ -851,12 +855,18 @@ public class QuickStatusBarHeader extends RelativeLayout implements
 
     @Override
     public void onTuningChanged(String key, String newValue) {
-        if (STATUS_BAR_CUSTOM_HEADER.equals(key)) {
-            mHeaderImageEnabled = TunerService.parseIntegerSwitch(newValue, false);
-            updateResources();
-        } else if (StatusBarIconController.ICON_BLACKLIST.equals(key)) {
-            mClockView.setClockVisibleByUser(!StatusBarIconController.getIconBlacklist(
-                    mContext, newValue).contains("clock"));
+        switch (key) {
+            case STATUS_BAR_CUSTOM_HEADER:
+                mHeaderImageEnabled = TunerService.parseIntegerSwitch(newValue, false);
+                updateResources();
+                break;
+            case STATUS_BAR_CLOCK:
+                int showClock =
+                        TunerService.parseInteger(newValue, CLOCK_POSITION_LEFT);
+                mClockView.setClockVisibleByUser(showClock != CLOCK_POSITION_HIDE);
+                break;
+            default:
+                break;
         }
     }
 }
