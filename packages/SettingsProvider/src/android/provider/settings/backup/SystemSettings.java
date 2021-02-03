@@ -89,7 +89,6 @@ public class SystemSettings {
         Settings.System.VIBRATE_ON_CONNECT,
         Settings.System.VIBRATE_ON_CALLWAITING,
         Settings.System.VIBRATE_ON_DISCONNECT,
-        Settings.System.DOZE_ON_CHARGE,
         Settings.System.NOTIFICATION_PULSE,
         Settings.System.AOD_NOTIFICATION_PULSE,
         Settings.System.AOD_NOTIFICATION_PULSE_CLEAR,

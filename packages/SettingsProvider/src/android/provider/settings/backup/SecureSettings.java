@@ -105,6 +105,7 @@ public class SecureSettings {
         Settings.Secure.DOZE_PICK_UP_GESTURE,
         Settings.Secure.DOZE_DOUBLE_TAP_GESTURE,
         Settings.Secure.DOZE_TAP_SCREEN_GESTURE,
+        Settings.Secure.DOZE_ON_CHARGE_NOW,
         Settings.Secure.NFC_PAYMENT_DEFAULT_COMPONENT,
         Settings.Secure.AUTOMATIC_STORAGE_MANAGER_DAYS_TO_RETAIN,
         Settings.Secure.FACE_UNLOCK_KEYGUARD_ENABLED,
