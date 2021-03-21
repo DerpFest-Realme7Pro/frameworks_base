@@ -6076,7 +6076,12 @@ public final class Settings {
          */
         public static final String QS_PANEL_CUSTOM_IMAGE = "qs_panel_custom_image";
 
+        /**
+         * Enable and disable QS Panel visualizer
+         * @hide
          */
+        public static final String VISUALIZER_CENTER_MIRRORED = "visualizer_center_mirrored";
+
         /**
         * Show Synth Smart Media in keyguard
         * by.tikkiX2
@@ -10608,6 +10613,12 @@ public final class Settings {
          * @hide
          */
         public static final String PULSE_SOLID_UNITS_ROUNDED = "pulse_solid_units_rounded";
+
+        /**
+         * Pulse gravity
+         * @hide
+         */
+        public static final String PULSE_CUSTOM_GRAVITY = "pulse_custom_gravity";
 
         /**
          * Keys we no longer back up under the current schema, but want to continue to
