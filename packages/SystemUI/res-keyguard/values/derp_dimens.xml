@@ -34,4 +34,6 @@
     <dimen name="oos_clock_left_padding">20dp</dimen>
     <dimen name="ide_clock_left_padding">40dp</dimen>
 
+    <!-- The height if the smart media -->
+    <dimen name="smart_media_height">200dp</dimen>
 </resources>
