@@ -6095,6 +6095,8 @@ public final class Settings {
         */
         public static final String SYNTH_SMART_MEDIA = "synth_smart_media";
 
+        public static final String SMART_MEDIA_THEME = "smart_media_theme";
+
         /**
         * Synth Smart Media Title Font
         * @hide
