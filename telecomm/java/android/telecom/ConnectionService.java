@@ -2106,14 +2106,12 @@ public abstract class ConnectionService extends Service {
         findConnectionForAction(callId, "abort").onAbort();
     }
 
-    /** {@hide} */
-    protected void answerVideo(String callId, int videoState) {
+    private void answerVideo(String callId, int videoState) {
         Log.i(this, "answerVideo %s", callId);
         doAnswer(callId, videoState);
     }
 
-    /** {@hide} */
-    protected void answer(String callId) {
+    private void answer(String callId) {
         Log.i(this, "answer %s", callId);
         doAnswer(callId, VideoProfile.STATE_AUDIO_ONLY);
     }
