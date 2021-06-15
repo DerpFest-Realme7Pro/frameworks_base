@@ -6107,6 +6107,13 @@ public final class Settings {
         };
 
         /**
+         * Wallpaper based accents
+         * @hide
+         */
+        public static final String USE_WALL_ACCENT = "use_wall_accent";
+        public static final String AUTO_ACCENT_TYPE = "auto_accent_type";
+
+        /**
          * These are all public system settings
          *
          * @hide
@@ -6253,6 +6260,8 @@ public final class Settings {
             PRIVATE_SETTINGS.add(QS_PANEL_TYPE_BACKGROUND);
             PRIVATE_SETTINGS.add(QS_PANEL_CUSTOM_IMAGE);
             PRIVATE_SETTINGS.add(QS_PANEL_CUSTOM_IMAGE_BLUR);
+            PRIVATE_SETTINGS.add(USE_WALL_ACCENT);
+            PRIVATE_SETTINGS.add(AUTO_ACCENT_TYPE);
         }
 
         /**
