@@ -6083,6 +6083,13 @@ public final class Settings {
         };
 
         /**
+         * Wallpaper based accents
+         * @hide
+         */
+        public static final String USE_WALL_ACCENT = "use_wall_accent";
+        public static final String AUTO_ACCENT_TYPE = "auto_accent_type";
+
+        /**
          * These are all public system settings
          *
          * @hide
@@ -6224,6 +6231,8 @@ public final class Settings {
             PRIVATE_SETTINGS.add(DOZE_BRIGHTNESS_FORCE);
             PRIVATE_SETTINGS.add(DISPLAY_CUTOUT_MODE);
             PRIVATE_SETTINGS.add(STOCK_STATUSBAR_IN_HIDE);
+            PRIVATE_SETTINGS.add(USE_WALL_ACCENT);
+            PRIVATE_SETTINGS.add(AUTO_ACCENT_TYPE);
         }
 
         /**
