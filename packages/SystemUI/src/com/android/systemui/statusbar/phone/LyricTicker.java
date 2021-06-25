@@ -61,8 +61,6 @@ public abstract class LyricTicker implements DarkReceiver {
     private CharSequence mCurrentText;
     private StatusBarNotification mCurrentNotification;
 
-    private Drawable icon;
-
     private ContrastColorUtil mNotificationColorUtil;
 
     private Animation mAnimationIn;
@@ -113,13 +111,9 @@ public abstract class LyricTicker implements DarkReceiver {
         if (!isNotificationEquals(mCurrentNotification, n) || notification.extras.getBoolean("ticker_icon_switch", false)) {
             mCurrentNotification = n;
             int iconId = notification.extras.getInt("ticker_icon", notification.icon);
-            icon = StatusBarIconView.getIcon(mContext, 
-                new StatusBarIcon(n.getPackageName(), n.getUser(), iconId, notification.iconLevel, 0,
-                    notification.tickerText));
 
             mIconSwitcher.setAnimateFirstView(false);
             mIconSwitcher.reset();
-            setAppIconColor(icon);
 
             mTextSwitcher.setAnimateFirstView(false);
             mTextSwitcher.reset();
@@ -188,12 +182,6 @@ public abstract class LyricTicker implements DarkReceiver {
         if (mTextSwitcher != null) mTextSwitcher.setTextColor(mTextColor);
         if (mIconSwitcher != null) {
             mIconSwitcher.reset();
-            setAppIconColor(icon);
         }
-    }
-
-    private void setAppIconColor(Drawable icon) {
-        boolean isGrayscale = mNotificationColorUtil.isGrayscaleIcon(icon);
-        mIconSwitcher.setImageDrawableTint(icon, mIconTint, isGrayscale);
     }
 }
