@@ -157,7 +157,6 @@ public final class ClockManager {
         addBuiltinClock(() -> new SamsungHighlightClockController(res, layoutInflater, colorExtractor));
         addBuiltinClock(() -> new AnalogClockController(res, layoutInflater, colorExtractor));
         addBuiltinClock(() -> new TypeClockController(res, layoutInflater, colorExtractor));
-<<<<<<< HEAD
         addBuiltinClock(() -> new TypeClockCenteredController(res, layoutInflater, colorExtractor));
         addBuiltinClock(() -> new IDEClockController(res, layoutInflater, colorExtractor, context));
         addBuiltinClock(() -> new DividedLinesClockController(res, layoutInflater, colorExtractor));
@@ -177,6 +176,7 @@ public final class ClockManager {
         addBuiltinClock(() -> new Fluidv2ClockController(res, layoutInflater, colorExtractor));
         addBuiltinClock(() -> new AndroidSClockController(res, layoutInflater, colorExtractor));
         addBuiltinClock(() -> new AndroidSDP3ClockController(res, layoutInflater, colorExtractor));
+        addBuiltinClock(() -> new Android12ClockController(res, layoutInflater, colorExtractor));
 
         // Store the size of the display for generation of clock preview.
         DisplayMetrics dm = res.getDisplayMetrics();

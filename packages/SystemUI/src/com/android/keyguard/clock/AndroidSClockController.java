@@ -33,10 +33,13 @@ import android.icu.text.DateFormat;
 import android.icu.text.DisplayContext;
 import android.net.Uri;
 import android.text.Html;
+import android.transition.AutoTransition;
 import android.transition.ChangeBounds;
 import android.transition.Fade;
 import android.transition.Transition;
 import android.transition.TransitionManager;
+import android.transition.TransitionSet;
+import android.util.MathUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -56,6 +59,7 @@ import com.android.systemui.colorextraction.SysuiColorExtractor;
 import com.android.systemui.plugins.ClockPlugin;
 
 import com.android.systemui.keyguard.KeyguardSliceProvider;
+import com.android.systemui.synth.transition.Scale;
 import com.android.keyguard.KeyguardSliceView.KeyguardSliceTextView;
 import com.android.keyguard.KeyguardSliceView.Row;
 
@@ -89,12 +93,13 @@ import static com.android.systemui.statusbar.phone
  */
 public class AndroidSClockController implements ClockPlugin {
 
-    private final float mTextSizeNormal = 38f;
-    private final float mTextSizeBig = 68f;
+    private final float mTextSizeNormal = 48f;
+    private final float mTextSizeBig = 96f;
     private final float mSliceTextSize = 24f;
     private final float mTitleTextSize = 28f;
     private boolean mHasVisibleNotification = false;
     private boolean mClockState = false;
+    private boolean mClockAnimating = false;
     private float clockDividY = 6f;
 
     /**
@@ -133,6 +138,7 @@ public class AndroidSClockController implements ClockPlugin {
     private ConstraintSet mContainerSetBig = new ConstraintSet();
 
     private Context mContext;
+    
     private Row mRow;
     private TextView mTitle;
     private int mIconSize;
@@ -149,8 +155,10 @@ public class AndroidSClockController implements ClockPlugin {
     private int mTextColor;
     private float mDarkAmount = 0;
     private int mRowHeight = 0;
+    private int mClockWidth = 0;
 
     private Typeface mSliceTypeface;
+    private Typeface mClockTypeface;
 
     /**
      * Time and calendars to check the date
@@ -187,6 +195,8 @@ public class AndroidSClockController implements ClockPlugin {
         mContainerSetBig.clone(mContainerBig);
         mClock.setFormat12Hour("hh\nmm");
         mClock.setFormat24Hour("kk\nmm");
+        mClockWidth = mClock.getWidth();
+        mClockTypeface = mClock.getTypeface();
 
         mTitle = mView.findViewById(R.id.title);
         mRow = mView.findViewById(R.id.row);
@@ -197,7 +207,6 @@ public class AndroidSClockController implements ClockPlugin {
         mRowWithHeaderTextSize = mContext.getResources().getDimensionPixelSize(
                 R.dimen.header_row_font_size);
         mTextColor = Utils.getColorAttrDefaultColor(mContext, R.attr.wallpaperTextColor);
-        mSliceTypeface = mClock.getTypeface();
     }
 
     @Override
@@ -219,7 +228,7 @@ public class AndroidSClockController implements ClockPlugin {
 
     @Override
     public Bitmap getThumbnail() {
-        return BitmapFactory.decodeResource(mResources, R.drawable.default_thumbnail);
+        return BitmapFactory.decodeResource(mResources, R.drawable.samsung_thumbnail);
     }
 
     @Override
@@ -257,6 +266,21 @@ public class AndroidSClockController implements ClockPlugin {
     @Override
     public void setTextColor(int color) {
         mClock.setTextColor(color);
+    }
+
+    @Override
+    public void setTypeface(Typeface tf) {
+        mClockTypeface = tf;
+    }
+
+    @Override
+    public void setDateTypeface(Typeface tf) {
+        for (int i = 0; i < mRow.getChildCount(); i++) {
+            KeyguardSliceTextView child = (KeyguardSliceTextView) mRow.getChildAt(i);
+            child.setTypeface(tf);
+        }
+        mTitle.setTypeface(tf);
+        mSliceTypeface = tf;
     }
 
     @Override
@@ -311,11 +335,13 @@ public class AndroidSClockController implements ClockPlugin {
             RowContent rc = (RowContent) subItems.get(i);
             SliceItem item = rc.getSliceItem();
             final Uri itemTag = item.getSlice().getUri();
+            final boolean isWeatherSlice = itemTag.toString().equals(KeyguardSliceProvider.KEYGUARD_WEATHER_URI);
             final boolean isDateSlice = itemTag.toString().equals(KeyguardSliceProvider.KEYGUARD_DATE_URI);
             // Try to reuse the view if already exists in the layout
             KeyguardSliceTextView button = mRow.findViewWithTag(itemTag);
             if (button == null) {
                 button = new KeyguardSliceTextView(mContext);
+                button.setShouldTintDrawable(!isWeatherSlice);
                 button.setTextSize(isDateSlice ? mTitleTextSize : mSliceTextSize);
                 button.setTextColor(blendedColor);
                 button.setGravity(Gravity.START);
@@ -323,6 +349,7 @@ public class AndroidSClockController implements ClockPlugin {
                 final int viewIndex = i - (mHasHeader ? 0 : 0);
                 mRow.addView(button, viewIndex);
             } else {
+                button.setShouldTintDrawable(!isWeatherSlice);
                 button.setTextSize(isDateSlice ? mTitleTextSize : mSliceTextSize);
                 button.setGravity(Gravity.START);
             }
@@ -376,7 +403,6 @@ public class AndroidSClockController implements ClockPlugin {
         mRow.requestLayout();
 
         mRowHeight = mRow.getHeight() + (mHasHeader ? mTitle.getHeight() : 0);
-        if (mRow.getChildCount() != 0) mContainerSetBig.setMargin(mClock.getId(), ConstraintSet.TOP, mRowHeight);
     };
 
     /**
@@ -392,63 +418,45 @@ public class AndroidSClockController implements ClockPlugin {
     }
 
     private void animate() {
-        final float differenceSize = mTextSizeBig - mTextSizeNormal;
         mClock.clearAnimation();
         if (!mHasVisibleNotification) {
-            if (!mClockState) {
-                mClock.animate()
-                            .setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                @Override
-                                public void onAnimationUpdate(ValueAnimator animation) {
-                                    mClock.setTextSize((float) Converter.dpToPx(mContext, (int) (mTextSizeNormal + (differenceSize * animation.getAnimatedFraction()))));
-                                    mClock.requestLayout();
-                                }
-                            })
-                            .setDuration(550)
-                            .withStartAction(() -> {
-                                TransitionManager.beginDelayedTransition(mContainer,
-                                new Fade().setDuration(550).addTarget(mContainer));
-                                mContainerSetBig.applyTo(mContainer);
-                            })
-                            .withEndAction(() -> {
-                                mClockState = true;
-                                setSlice(mSlice);
-                            })
-                            .start();
-            }
+            mClockWidth = mClock.getWidth();
+            ValueAnimator animatorTextSizeNoNotification = ValueAnimator.ofFloat(mTextSizeNormal, mTextSizeBig);
+            animatorTextSizeNoNotification.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    mClock.setTextSize((float) Converter.dpToPx(mContext, (int) ((float) animation.getAnimatedValue())));
+                    mContainerSet.setHorizontalBias(mClock.getId(), MathUtils.lerp(1f, 0.5f, animation.getAnimatedFraction()));
+                    mContainerSet.setMargin(mTitle.getId(), ConstraintSet.END, ((int) MathUtils.lerp(mClockWidth, 0f, animation.getAnimatedFraction())));
+                    mContainerSet.setMargin(mRow.getId(), ConstraintSet.END, ((int) MathUtils.lerp(mClockWidth, 0f, animation.getAnimatedFraction())));
+                    if (mRow.getChildCount() != 0) mContainerSet.setMargin(mClock.getId(), ConstraintSet.TOP, ((int) MathUtils.lerp(0f, mRowHeight, animation.getAnimatedFraction())));
+                    mContainerSet.applyTo(mContainer);
+                }
+            });
+            animatorTextSizeNoNotification.start();
         } else {
-            if (mClockState) {
-                mClock.animate()
-                            .setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                @Override
-                                public void onAnimationUpdate(ValueAnimator animation) {
-                                    mClock.setTextSize((float) Converter.dpToPx(mContext, (int) (mTextSizeNormal + (differenceSize * (1f - animation.getAnimatedFraction())))));
-                                    mClock.requestLayout();
-                                }
-                            })
-                            .setDuration(550)
-                            .withStartAction(() -> {
-                                TransitionManager.beginDelayedTransition(mContainer,
-                                new Fade().setDuration(550).addTarget(mContainer));
-                                mContainerSet.applyTo(mContainer);
-                            })
-                            .withEndAction(() -> {
-                                mClockState = false;
-                                setSlice(mSlice);
-                            })
-                            .start();
-            }
+            ValueAnimator animatorTextSizeNotification = ValueAnimator.ofFloat(mTextSizeBig, mTextSizeNormal);
+            animatorTextSizeNotification.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    mClock.setTextSize((float) Converter.dpToPx(mContext, (int) ((float) animation.getAnimatedValue())));
+                    mContainerSet.setHorizontalBias(mClock.getId(), MathUtils.lerp(0.5f, 1f, animation.getAnimatedFraction()));
+                    mContainerSet.setMargin(mTitle.getId(), ConstraintSet.END, ((int) MathUtils.lerp(0f, mClockWidth, animation.getAnimatedFraction())));
+                    mContainerSet.setMargin(mRow.getId(), ConstraintSet.END, ((int) MathUtils.lerp(0f, mClockWidth, animation.getAnimatedFraction())));
+                    if (mRow.getChildCount() != 0) mContainerSet.setMargin(mClock.getId(), ConstraintSet.TOP, ((int) MathUtils.lerp(mRowHeight, 0f, animation.getAnimatedFraction())));
+                    mContainerSet.applyTo(mContainer);
+                }
+            });
+            animatorTextSizeNotification.start();
         }
     }
 
     @Override
     public void onTimeTick() {
-        animate();
     }
 
     @Override
     public void setDarkAmount(float darkAmount) {
         mView.setDarkAmount(darkAmount);
+        if (mClockTypeface != null) mClock.setTypeface(Typeface.create(mClockTypeface, (mClockTypeface.getWeight() - ((int) (300f * darkAmount))), mClockTypeface.isItalic()));
         for (int i = 0; i < mRow.getChildCount(); i++) {
             KeyguardSliceTextView child = (KeyguardSliceTextView) mRow.getChildAt(i);
             final boolean isDateSlice = child.getTag().toString().equals(KeyguardSliceProvider.KEYGUARD_DATE_URI);

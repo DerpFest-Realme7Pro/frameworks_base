@@ -576,7 +576,19 @@ public class KeyguardSliceView extends LinearLayout implements View.OnClickListe
         private boolean shouldTintDrawable = true;
 
         public KeyguardSliceTextView(Context context) {
-            super(context, null /* attrs */, 0 /* styleAttr */, sStyleId);
+            super(context, null /* attrs */);
+        }
+
+        public KeyguardSliceTextView(Context context, AttributeSet attrs) {
+            this(context, attrs, 0);
+        }
+
+        public KeyguardSliceTextView(Context context, AttributeSet attrs, int defStyleAttr) {
+            this(context, attrs, defStyleAttr, sStyleId);
+        }
+
+        public KeyguardSliceTextView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+            super(context, attrs, defStyleAttr, sStyleId);
             onDensityOrFontScaleChanged();
             setEllipsize(TruncateAt.END);
         }

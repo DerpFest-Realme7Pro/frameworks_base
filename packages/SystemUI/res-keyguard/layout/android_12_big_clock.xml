@@ -33,10 +33,12 @@
             android:layout_marginTop="0dp"
             android:layout_marginStart="12dp"
             android:gravity="start|top"
-            android:lineSpacingMultiplier="0.9"
+            android:format12Hour="h:mm"
+            android:format24Hour="kk:mm"
             android:textAlignment="center"
             android:textColor="?attr/wallpaperTextColor"
             android:textSize="48dp"
+            android:visibility="gone"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:theme="@style/TextAppearance.Keyguard"
@@ -69,6 +71,24 @@
             app:layout_constraintTop_toBottomOf="@id/title"
             app:layout_constraintStart_toStartOf="parent" 
             app:layout_constraintEnd_toEndOf="parent" 
+        />
+        <TextClock
+            android:id="@+id/clock_center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-0dp"
+            android:gravity="end|top"
+            android:format12Hour="hh\nmm"
+            android:format24Hour="kk\nmm"
+            android:textAlignment="center"
+            android:textColor="?attr/wallpaperTextColor"
+            android:textSize="120dp"
+            android:visibility="visible"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            android:theme="@style/TextAppearance.Keyguard"
         />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.android.keyguard.clock.ClockLayout>
